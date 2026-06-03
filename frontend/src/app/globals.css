@@ -28,10 +28,11 @@
 
   /* Container */
   --container-padding: 1rem;
-  --container-md: 28rem;
-  --container-lg: 32rem;
-  --container-xl: 36rem;
-  --container-2xl: 42rem;
+  --container-sm: 40rem;
+  --container-md: 48rem;
+  --container-lg: 64rem;
+  --container-xl: 80rem;
+  --container-2xl: 96rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -70,7 +71,7 @@ body {
   .container { --container-padding: 1.5rem; }
 }
 @media (min-width: 1024px) {
-  .container { --container-padding: 2rem; }
+  .container { --container-padding: 2rem; max-width: var(--container-lg); }
 }
 @media (min-width: 1280px) {
   .container { max-width: var(--container-xl); }

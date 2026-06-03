@@ -14,7 +14,7 @@ export function Header() {
           <span className="text-lg font-bold">CloudBook</span>
         </Link>
 
-        <div className="flex-1 max-w-md">
+        <div className="flex-1 max-w-lg xl:max-w-xl">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
