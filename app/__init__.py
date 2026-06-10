@@ -1,5 +1,6 @@
 from flask import Flask
-from app.models.book import db
+from app.models.base import db
+# from app.models import book,user, book_list
 
 # 创建app
 def create_app():
@@ -18,5 +19,7 @@ def create_app():
 
 # 注册蓝图
 def register_blueprints(app):
-    from .web.book import web
+    from .web import web
+    # from .api.book import api
     app.register_blueprint(web)
+    # app.register_blueprint(api)

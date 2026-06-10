@@ -7,7 +7,10 @@ export interface Book {
   binding?: string
   publisher?: string
   price: string
-  image?: string
+  image?: {
+    thumbnail: string
+    large?: string
+  }
   summary?: string
   isbn?: string
   rating?: number
@@ -24,11 +27,12 @@ export const api = {
   books: {
     list: async (params: BookSearchParams = {}) => {
       const query = new URLSearchParams(params as Record<string, string>)
-      const res = await fetch(`${API_BASE_URL}/api/books?${query}`)
+      const res = await fetch(`${API_BASE_URL}/api/book/search?${query}`)
+      console.log(res,'========')
       return res.json()
     },
-    detail: async (id: string) => {
-      const res = await fetch(`${API_BASE_URL}/api/books/${id}`)
+    detail: async (isbn: string) => {
+      const res = await fetch(`${API_BASE_URL}/api/book/details/${isbn}`)
       return res.json()
     },
   },

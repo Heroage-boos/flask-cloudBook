@@ -5,7 +5,10 @@ export interface Book {
   binding?: string
   publisher?: string
   price: string
-  image?: string
+  image: {
+    thumbnail: string
+    large?: string
+  }
   summary?: string
   isbn?: string
   rating?: number

@@ -5,8 +5,10 @@ class BookSpider:
     """spider for book"""
     # 根据isbn搜书 返回单本书
     isbn_url = "http://t.talelin.com/v2/book/isbn/{}"
+    # 根据id搜书 返回单本书
+    id_url = "http://t.talelin.com/v2/book/{}"
     # 根据关键字搜书 返回集合
-    keyword_url = "http://inavoy.com/v2/book/search?q={}&&start={}&count={}"
+    keyword_url = "http://t.talelin.com/v2/book/search?q={}&&start={}&count={}"
     
     def __init__(self, data):
         self.books = []
@@ -30,6 +32,10 @@ class BookSpider:
         # 填充到对象
         self.__single__(r)
     
+    def id_search(self, book_id):
+        url = BookSpider.id_url.format(book_id)
+        r = HTTP.get(url)
+        self.__single__(r)
 
     def keyword_search(self, keyword, start=1, count=15):
         url = BookSpider.keyword_url.format(keyword, start, count)

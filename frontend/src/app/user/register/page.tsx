@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { BookOpen } from "lucide-react"
+import { api } from "@/lib/api"
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("")
@@ -27,11 +28,19 @@ export default function RegisterPage() {
       return
     }
 
+    // try {
+    //   await register({ email, password, nickname })
+    //   router.push("/")
+    // } catch (err) {
+    //   setError(err instanceof Error ? err.message : "注册失败")
+    // }
+
+    // 简单测试注册接口
     try {
-      await register({ email, password, nickname })
-      router.push("/")
+      const res = await api.user.register({ email, password, nickname})
+      console.log(res)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "注册失败")
+      setError("注册失败")
     }
   }
 

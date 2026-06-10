@@ -1,11 +1,28 @@
 "use client"
 
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { BookOpen, ShoppingCart, User, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 export function Header() {
+  const router = useRouter()
+  const [keyword, setKeyword] = useState("")
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleSearch(keyword)
+    }
+  }
+
+  const handleSearch = (query: string) => {
+    if (!query.trim()) return
+    router.push(`/book?q=${encodeURIComponent(query.trim())}`)
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center gap-4">
@@ -15,14 +32,20 @@ export function Header() {
         </Link>
 
         <div className="flex-1 max-w-lg xl:max-w-xl">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="搜索书籍..."
-              className="pl-9 w-full"
-            />
-          </div>
+          <form onSubmit={(e) => { e.preventDefault(); handleSearch(keyword) }}>
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                onKeyDown={handleKeyDown}
+                type="search"
+                enterKeyHint="search"
+                placeholder="搜索书籍..."
+                className="pl-9 w-full"
+              />
+            </div>
+          </form>
         </div>
 
         <nav className="flex items-center gap-2">
