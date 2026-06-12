@@ -1,6 +1,9 @@
 from flask import Flask
 from app.models.base import db
 # from app.models import book,user, book_list
+from flask_login import LoginManager
+
+login_manager = LoginManager()
 
 # 创建app
 def create_app():
@@ -12,6 +15,11 @@ def create_app():
 
     # 初始化db
     db.init_app(app)
+
+    # 初始化login_manager
+    login_manager.init_app(app)
+
+    # 创建表
     with app.app_context():
         db.create_all()
 

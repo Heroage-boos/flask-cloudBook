@@ -1,30 +1,37 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { useAuth } from "@/store/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { BookOpen } from "lucide-react"
+import { api } from "@/lib/api"
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const router = useRouter()
-  const { login, isLoading } = useAuth()
+  const searchParams = useSearchParams()
+  const redirect = searchParams.get("redirect") || "/"
+  const { isLoading } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
 
     try {
-      await login({ email, password })
-      router.push("/")
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "登录失败")
+      const res = await api.user.login({ email, password })
+      if (res.code === 0) {
+        router.push(redirect)
+      } else {
+        setError(res.message || "登录失败")
+      }
+    } catch {
+      setError("网络错误，请重试")
     }
   }
 
@@ -84,5 +91,13 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[calc(100vh-200px)] flex items-center justify-center"><p className="text-muted-foreground">加载中...</p></div>}>
+      <LoginForm />
+    </Suspense>
   )
 }

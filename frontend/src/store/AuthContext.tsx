@@ -2,11 +2,12 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react"
 import { User, LoginData, RegisterData } from "@/types/user"
-import { api } from "@/lib/api"
+import { api, type ApiResponse } from "@/lib/api"
 
 interface AuthContextType {
   user: User | null
-  isLoading: boolean
+  isLoading: boolean  // true = 正在校验登录态，尚未完成
+  isAuthenticated: boolean
   login: (data: LoginData) => Promise<void>
   register: (data: RegisterData) => Promise<void>
   logout: () => void
@@ -18,16 +19,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  // 启动时：先从 localStorage 恢复，再向后端校验 session 是否仍有效
   useEffect(() => {
-    const savedUser = localStorage.getItem("cloudbook-user")
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser))
-      } catch {
-        // ignore
+    async function validateSession() {
+      const savedUser = localStorage.getItem("cloudbook-user")
+      if (savedUser) {
+        try {
+          const parsed = JSON.parse(savedUser)
+          setUser(parsed)
+        } catch {
+          // ignore corrupt data
+        }
       }
+
+      // 向后端发请求校验 cookie/session 是否有效
+      const isValid = await api.user.checkSession()
+      if (!isValid) {
+        // 后端 session 已过期，清除本地状态
+        setUser(null)
+        localStorage.removeItem("cloudbook-user")
+      }
+      setIsLoading(false)
     }
-    setIsLoading(false)
+
+    validateSession()
   }, [])
 
   useEffect(() => {
@@ -42,8 +57,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true)
     try {
       const response = await api.user.login(data)
-      if (response.success) {
-        setUser(response.user)
+      if (response.code === 0) {
+        setUser(response.data as unknown as User)
       } else {
         throw new Error(response.message || "登录失败")
       }
@@ -56,8 +71,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true)
     try {
       const response = await api.user.register(data)
-      if (response.success) {
-        setUser(response.user)
+      if (response.code === 0) {
+        setUser(response.data as unknown as User)
       } else {
         throw new Error(response.message || "注册失败")
       }
@@ -72,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, isAuthenticated: !!user && !isLoading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   )

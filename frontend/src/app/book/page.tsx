@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { BookOpen, SearchX } from "lucide-react"
@@ -75,7 +75,7 @@ function EmptyState({ onClear }: { onClear: () => void }) {
 }
 
 /* ========== 主页面组件 ========== */
-export default function BookListPage() {
+function BookListContent() {
   const searchParams = useSearchParams()
   const initialQuery = searchParams.get("q") || ""
 
@@ -176,5 +176,13 @@ export default function BookListPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function BookListPage() {
+  return (
+    <Suspense fallback={<BookGridSkeleton />}>
+      <BookListContent />
+    </Suspense>
   )
 }

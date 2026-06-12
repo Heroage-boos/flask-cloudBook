@@ -25,6 +25,15 @@ class Book(Base):
             "summary": self.summary,
             "isbn": self.isbn
         }
+    def recent(self):
+        # 链式操作
+        # filter: 过滤条件
+        # order_by: 排序
+        # first: 取第一个
+        # desc: 降序
+        # 按时间排序取最新
+        recent = Book.query.filter_by(status=1).order_by(Book.created_at.desc()).first()
+        return recent
 
 
 
